@@ -1,16 +1,25 @@
-let rec break x xs =
+let rec break_none xs =
   match xs with
   | hd :: tl ->
-      if hd == x then ([], xs) else let (ys, zs) = break x tl in (hd :: ys, zs)
+    begin
+      match hd with
+      | Some i -> let (ys, zs) = break_none tl in (i :: ys, zs) 
+      | None -> ([], xs)
+    end
   | [] -> ([], xs)
 
-let rec lines xs =
-  match break '\n' xs with
-  | ys', _ :: zs -> let ys''= lines zs in ys' :: ys''
-  | ys', _ -> [ys']
+let rec remove_none xs =
+  match break_none xs with
+  | ys, _ :: tl -> let ys' = remove_none tl in ys :: ys'
+  | ys, _ -> [ys]
 
-(* I don't want to deal with this pain *)
-let list_of_string s = String.to_seq s |> List.of_seq
+let split_on_nl = String.split_on_char '\n'
+let strings_to_ints = List.map int_of_string_opt
+
+let sum_lists = List.map (List.fold_left (+) 0)
+let max = function
+| hd :: tl -> Some (List.fold_left max hd tl)
+| [] -> None
 
 let d1 xs =
-  lines
+  split_on_nl xs |> strings_to_ints |> remove_none |> sum_lists |> max |> Option.get
