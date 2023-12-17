@@ -8,7 +8,7 @@ countPossible str gs = count str (HM.singleton (False,0,gs) 1)
     -- Lazy DFA construction.
     count (x:xs) = count xs 
       . HM.foldlWithKey' (\a k v -> countMachine x k v a) HM.empty
-    count [] = HM.foldl' (+) 0  . HM.filterWithKey (\(_,_,g) _ -> null g)
+    count [] = HM.foldl' (+) 0  . HM.filterWithKey (\(_,_,g) -> const $ null g)
 
     countMachine '#' (False,n,g@(hd:tl)) v =
       HM.insertWith (+) (if n + 1 == hd then (True,0,tl) else (False,n+1,g)) v
@@ -28,16 +28,14 @@ splitOn n xs = hd:splitOn n tl
 
 parseGroups :: String -> [(String, [Int])]
 parseGroups =
-  map (\(p, gs) -> (p, map (read :: String -> Int) 
-                              $ splitOn ','
-                              $ drop 1 gs ))
+  map (\(p, gs) -> (p, map read $ splitOn ',' $ drop 1 gs ))
   . map (break (==' '))
   . lines
 
 sumPossible :: String -> Int
 sumPossible =
   sum
-  . map (\(p, gs) -> countPossible p gs)
+  . map (uncurry countPossible)
   . parseGroups
 
 cycleN :: [a] -> Int -> [a] 
@@ -48,6 +46,6 @@ cycleN xs n = xs ++ (cycleN xs $ n-1)
 sumPossible2 :: String -> Int
 sumPossible2 =
   sum
-  . map (\(p, gs) -> countPossible p gs)
+  . map (uncurry countPossible)
   . map (\(p, gs) -> (p ++ cycleN ('?':p) 4, cycleN gs 5))
   . parseGroups

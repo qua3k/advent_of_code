@@ -22,10 +22,12 @@ solveChallenge (14:1:_) = do
 solveChallenge (14:2:_) = do
   text <- readFile' "data/14.txt"
   return $ show $ calculateFocus text
-solveChallenge (16:_) = do
+solveChallenge (16:1:_) = do
   text <- readFile' "data/16.txt"
-  return $ show $ findEnergy text 
-
+  return $ show $ findEnergy text
+solveChallenge (16:2:_) = do
+  text <- readFile' "data/16.txt"
+  return $ show $ findMostEnergy text
 
 main :: IO ()
 main = do

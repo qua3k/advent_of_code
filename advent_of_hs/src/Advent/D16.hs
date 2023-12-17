@@ -74,18 +74,29 @@ searchBoard :: Point -> Direction -> Matrix Char -> Set.HashSet (Point, Directio
 searchBoard pt dir m set = case filterInsert (map ((,) next) ds, set) of
     ([], s) -> s
     (ks',s) -> foldl' (\a (p,d) -> 
-      --let p' = trace (show p) p in
       searchBoard p d m a) s ks'
   where
     next = getNext pt dir
     ds = getNextDirection next dir m
 
-search :: Matrix Char -> Int
-search m = Set.size $ Set.map (\(p,_) -> p)
-  $ searchBoard (0,-1) Right m Set.empty
+search :: Point -> Direction -> Matrix Char -> Int
+search p d m = Set.size $ Set.map fst
+  $ searchBoard p d m Set.empty
 
 toMatrix :: [[a]] -> Matrix a
 toMatrix = RRB.map (RRB.fromList) . RRB.fromList
 
 findEnergy :: String -> Int
-findEnergy = search . toMatrix . lines
+findEnergy = search (0,-1) Right . toMatrix . lines
+
+findMostEnergy :: String -> Int
+findMostEnergy s = max up $ max down $ max left right 
+  where
+    m = toMatrix $ lines s
+    cs = length m - 1
+    rs = (length $ RRB.index 0 m) - 1
+
+    left = maximum $ map (\p -> search p Left m) $ zip [0..cs] $ repeat (rs+1)
+    right = maximum $ map (\p -> search p Right m) $ zip [0..cs] $ repeat (-1)
+    down = maximum $ map (\p -> search p Down m) $ zip (repeat (-1)) [0..rs]
+    up = maximum $ map (\p -> search p Up m) $ zip (repeat (cs+1)) [0..rs]
