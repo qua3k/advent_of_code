@@ -38,3 +38,6 @@ cabal.project.local
 
 # Profiling
 *.prof
+
+# macOS
+.DS_Store
