@@ -27,3 +27,14 @@ setup.log
 
 # Local OPAM switch
 _opam/
+
+# Haskell
+
+# Build artifacts
+dist-newstyle/
+
+# Local cabal config
+cabal.project.local
+
+# Profiling
+*.prof
